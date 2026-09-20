@@ -2,6 +2,8 @@
 
 A tiny habit tracker built with Python's standard library.
 
+For a full explanation and usage guide, see [ABOUT.md](ABOUT.md).
+
 ## Usage
 
 ```text
