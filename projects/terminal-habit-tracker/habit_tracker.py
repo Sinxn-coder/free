@@ -55,6 +55,20 @@ def list_habits(habits: dict) -> None:
         print(f"[{marker}] {name}")
 
 
+def show_history(habits: dict, name: str) -> None:
+    if name not in habits:
+        raise SystemExit(f"Unknown habit: {name}")
+
+    completed_dates = habits[name].get("completed_dates", [])
+    if not completed_dates:
+        print(f"No completed days yet: {name}")
+        return
+
+    print(f"Completed days for {name}:")
+    for completed_date in completed_dates:
+        print(f"- {completed_date}")
+
+
 def complete_habit(habits: dict, name: str) -> None:
     if name not in habits:
         raise SystemExit(f"Unknown habit: {name}")
@@ -94,6 +108,9 @@ def build_parser() -> argparse.ArgumentParser:
     remove_parser = subparsers.add_parser("remove", help="Remove a habit.")
     remove_parser.add_argument("name", help="The habit name.")
 
+    history_parser = subparsers.add_parser("history", help="Show completed days.")
+    history_parser.add_argument("name", help="The habit name.")
+
     return parser
 
 
@@ -109,6 +126,8 @@ def main() -> None:
         complete_habit(habits, args.name)
     elif args.command == "remove":
         remove_habit(habits, args.name)
+    elif args.command == "history":
+        show_history(habits, args.name)
 
 
 if __name__ == "__main__":
