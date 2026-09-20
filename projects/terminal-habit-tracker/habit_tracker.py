@@ -9,7 +9,7 @@ from pathlib import Path
 DATA_FILE = Path(__file__).with_name(".habit_data.json")
 
 
-def load_habits():
+def load_habits() -> dict:
     if not DATA_FILE.exists():
         return {}
 
@@ -24,7 +24,7 @@ def load_habits():
     return data
 
 
-def save_habits(habits):
+def save_habits(habits: dict) -> None:
     try:
         with DATA_FILE.open("w", encoding="utf-8") as file:
             json.dump(habits, file, indent=2)
@@ -33,7 +33,7 @@ def save_habits(habits):
         raise SystemExit(f"Could not save {DATA_FILE}: {error}") from error
 
 
-def add_habit(habits, name):
+def add_habit(habits: dict, name: str) -> None:
     if name in habits:
         raise SystemExit(f"Habit already exists: {name}")
 
@@ -42,7 +42,7 @@ def add_habit(habits, name):
     print(f"Added: {name}")
 
 
-def list_habits(habits):
+def list_habits(habits: dict) -> None:
     if not habits:
         print("No habits yet. Add one with: python habit_tracker.py add \"Read\"")
         return
@@ -55,7 +55,7 @@ def list_habits(habits):
         print(f"[{marker}] {name}")
 
 
-def complete_habit(habits, name):
+def complete_habit(habits: dict, name: str) -> None:
     if name not in habits:
         raise SystemExit(f"Unknown habit: {name}")
 
@@ -70,7 +70,7 @@ def complete_habit(habits, name):
     print(f"Completed: {name}")
 
 
-def build_parser():
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Track daily habits from the terminal.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -85,7 +85,7 @@ def build_parser():
     return parser
 
 
-def main():
+def main() -> None:
     args = build_parser().parse_args()
     habits = load_habits()
 
