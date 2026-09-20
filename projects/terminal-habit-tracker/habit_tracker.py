@@ -70,6 +70,15 @@ def complete_habit(habits: dict, name: str) -> None:
     print(f"Completed: {name}")
 
 
+def remove_habit(habits: dict, name: str) -> None:
+    if name not in habits:
+        raise SystemExit(f"Unknown habit: {name}")
+
+    del habits[name]
+    save_habits(habits)
+    print(f"Removed: {name}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Track daily habits from the terminal.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -81,6 +90,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     done_parser = subparsers.add_parser("done", help="Mark a habit complete today.")
     done_parser.add_argument("name", help="The habit name.")
+
+    remove_parser = subparsers.add_parser("remove", help="Remove a habit.")
+    remove_parser.add_argument("name", help="The habit name.")
 
     return parser
 
@@ -95,6 +107,8 @@ def main() -> None:
         list_habits(habits)
     elif args.command == "done":
         complete_habit(habits, args.name)
+    elif args.command == "remove":
+        remove_habit(habits, args.name)
 
 
 if __name__ == "__main__":
