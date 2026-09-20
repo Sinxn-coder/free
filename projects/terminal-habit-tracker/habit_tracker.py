@@ -6,7 +6,7 @@ from datetime import date
 from pathlib import Path
 
 
-DATA_FILE = Path(".habit_data.json")
+DATA_FILE = Path(__file__).with_name(".habit_data.json")
 
 
 def load_habits():
