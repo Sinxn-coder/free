@@ -30,6 +30,13 @@ def complete(items: list[dict], index: int) -> None:
     save(items)
 
 
+def remove(items: list[dict], index: int) -> None:
+    if not 1 <= index <= len(items):
+        raise ValueError("todo number is out of range")
+    del items[index - 1]
+    save(items)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -38,12 +45,16 @@ def main() -> None:
     sub.add_parser("list")
     done_parser = sub.add_parser("done")
     done_parser.add_argument("number", type=int)
+    remove_parser = sub.add_parser("remove")
+    remove_parser.add_argument("number", type=int)
     args = parser.parse_args()
     items = load()
     if args.command == "add":
         add(items, args.text)
     elif args.command == "done":
         complete(items, args.number)
+    elif args.command == "remove":
+        remove(items, args.number)
     else:
         for number, item in enumerate(items, 1):
             print(f"[{'x' if item['done'] else ' '}] {number}. {item['text']}")
