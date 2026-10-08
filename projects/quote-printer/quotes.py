@@ -22,8 +22,9 @@ def random_quote(category: str | None = None, seed: int | None = None) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--category", choices=sorted(QUOTES))
+    parser.add_argument("--seed", type=int)
     args = parser.parse_args()
-    print(random_quote(args.category))
+    print(random_quote(args.category, seed=args.seed))
 
 
 if __name__ == "__main__":
