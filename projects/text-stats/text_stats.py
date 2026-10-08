@@ -8,12 +8,23 @@ import re
 
 def statistics(text: str) -> dict[str, int]:
     words = re.findall(r"\b[\w']+\b", text.lower())
+    paragraphs = 0
+    in_paragraph = False
+    for line in text.splitlines():
+        if line.strip():
+            if not in_paragraph:
+                paragraphs += 1
+            in_paragraph = True
+        else:
+            in_paragraph = False
+
     return {
         "characters": len(text),
         "words": len(words),
         "lines": text.count("\n") + (1 if text else 0),
         "reading_minutes": max(1, round(len(words) / 200)),
         "unique_words": len(set(words)),
+        "paragraphs": paragraphs,
     }
 
 
