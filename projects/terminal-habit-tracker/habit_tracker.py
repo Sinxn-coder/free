@@ -2,7 +2,7 @@
 
 import argparse
 import json
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 
@@ -69,6 +69,28 @@ def show_history(habits: dict, name: str) -> None:
         print(f"- {completed_date}")
 
 
+def show_streak(habits: dict, name: str) -> None:
+    if name not in habits:
+        raise SystemExit(f"Unknown habit: {name}")
+
+    completed_dates = set(habits[name].get("completed_dates", []))
+    today = date.today()
+    if today.isoformat() in completed_dates:
+        current_day = today
+    elif (today - timedelta(days=1)).isoformat() in completed_dates:
+        current_day = today - timedelta(days=1)
+    else:
+        current_day = None
+
+    streak = 0
+    while current_day is not None and current_day.isoformat() in completed_dates:
+        streak += 1
+        current_day -= timedelta(days=1)
+
+    unit = "day" if streak == 1 else "days"
+    print(f"Current streak for {name}: {streak} {unit}")
+
+
 def complete_habit(habits: dict, name: str) -> None:
     if name not in habits:
         raise SystemExit(f"Unknown habit: {name}")
@@ -111,6 +133,9 @@ def build_parser() -> argparse.ArgumentParser:
     history_parser = subparsers.add_parser("history", help="Show completed days.")
     history_parser.add_argument("name", help="The habit name.")
 
+    streak_parser = subparsers.add_parser("streak", help="Show the current daily completion streak.")
+    streak_parser.add_argument("name", help="The habit name.")
+
     return parser
 
 
@@ -128,6 +153,8 @@ def main() -> None:
         remove_habit(habits, args.name)
     elif args.command == "history":
         show_history(habits, args.name)
+    elif args.command == "streak":
+        show_streak(habits, args.name)
 
 
 if __name__ == "__main__":
