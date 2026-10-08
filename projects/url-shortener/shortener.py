@@ -10,9 +10,14 @@ DATA_FILE = Path(__file__).with_name("urls.json")
 
 
 def shorten(url: str, mappings: dict[str, str]) -> str:
-    code = hashlib.sha256(url.encode()).hexdigest()[:8]
-    mappings[code] = url
-    return code
+    digest = hashlib.sha256(url.encode()).hexdigest()
+    for length in range(8, len(digest) + 1):
+        code = digest[:length]
+        existing_url = mappings.get(code)
+        if existing_url is None or existing_url == url:
+            mappings[code] = url
+            return code
+    raise ValueError(f"Unable to create a unique code for URL: {url!r}")
 
 
 def main() -> None:
