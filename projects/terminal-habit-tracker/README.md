@@ -13,8 +13,12 @@ python habit_tracker.py list
 python habit_tracker.py done "Read for 20 minutes"
 python habit_tracker.py list
 python habit_tracker.py history "Read for 20 minutes"
+python habit_tracker.py streak "Read for 20 minutes"
 python habit_tracker.py remove "Drink water"
 ```
+
+The `streak` command reports consecutive completed days ending today or
+yesterday. If neither day is complete, it reports a zero-day streak.
 
 Habits are saved in `.habit_data.json` beside the script. The file is ignored
 by Git so your personal habits stay local.

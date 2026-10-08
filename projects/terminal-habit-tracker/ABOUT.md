@@ -12,6 +12,7 @@ You can:
 - See which habits are complete today.
 - Mark a habit complete for today.
 - View all recorded completion dates for a habit.
+- Check a habit's current consecutive daily completion streak.
 - Remove habits that you no longer want to track.
 
 ## Requirements
@@ -71,6 +72,15 @@ The same habit cannot be completed twice on the same day.
 ```text
 python habit_tracker.py history "Read for 20 minutes"
 ```
+
+### Check the current streak
+
+```text
+python habit_tracker.py streak "Read for 20 minutes"
+```
+
+The current streak counts consecutive completed days ending today or yesterday.
+If the habit was not completed today or yesterday, its current streak is zero.
 
 ### Remove a habit
 
