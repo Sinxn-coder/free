@@ -26,6 +26,13 @@ class FilterLinesTests(unittest.TestCase):
 
         self.assertEqual(result, ["other\n", "another"])
 
+    def test_case_insensitive_pattern_matches_mixed_case_content(self):
+        lines = ["ERROR: failed\n", "warning\n", "error recovered"]
+
+        result = list(filter_lines(lines, re.compile("error", re.IGNORECASE)))
+
+        self.assertEqual(result, ["ERROR: failed\n", "error recovered"])
+
 
 class CommandLineTests(unittest.TestCase):
     def run_cli(self, pattern, file, *options):
@@ -54,6 +61,32 @@ class CommandLineTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout, b"other\n")
+
+    def test_ignore_case_short_and_long_options_match_mixed_case_content(self):
+        with tempfile.TemporaryDirectory() as directory:
+            file = Path(directory) / "input.txt"
+            file.write_bytes(b"ERROR: failed\nwarning\nError recovered")
+
+            with self.subTest(option="-i"):
+                short_result = self.run_cli("error", file, "-i")
+            with self.subTest(option="--ignore-case"):
+                long_result = self.run_cli("error", file, "--ignore-case")
+
+        expected = b"ERROR: failed\nError recovered"
+        self.assertEqual(short_result.returncode, 0)
+        self.assertEqual(short_result.stdout, expected)
+        self.assertEqual(long_result.returncode, 0)
+        self.assertEqual(long_result.stdout, expected)
+
+    def test_matching_is_case_sensitive_by_default(self):
+        with tempfile.TemporaryDirectory() as directory:
+            file = Path(directory) / "input.txt"
+            file.write_bytes(b"ERROR\nerror\n")
+
+            result = self.run_cli("error", file)
+
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, b"error\n")
 
     def test_invalid_regex_has_clear_error(self):
         with tempfile.TemporaryDirectory() as directory:

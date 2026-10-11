@@ -24,10 +24,17 @@ def main(argv: list[str] | None = None) -> None:
         action="store_true",
         help="print lines that do not match the regular expression",
     )
+    parser.add_argument(
+        "-i",
+        "--ignore-case",
+        action="store_true",
+        help="match the regular expression without regard to case",
+    )
     args = parser.parse_args(argv)
 
     try:
-        pattern = re.compile(args.pattern)
+        flags = re.IGNORECASE if args.ignore_case else 0
+        pattern = re.compile(args.pattern, flags)
     except re.error as error:
         parser.error(f"invalid regular expression {args.pattern!r}: {error}")
 
