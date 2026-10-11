@@ -37,6 +37,35 @@ class TodoTests(unittest.TestCase):
                     todo.complete(items, index)
                 self.assertEqual(str(remove_error.exception), str(complete_error.exception))
 
+    def test_clear_completed_preserves_incomplete_items_and_persists(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(todo, "DATA_FILE", Path(directory) / "todos.json"):
+                items = [
+                    {"text": "First", "done": False},
+                    {"text": "Second", "done": True},
+                    {"text": "Third", "done": False},
+                ]
+                todo.save(items)
+
+                todo.clear_completed(items)
+
+                expected = [
+                    {"text": "First", "done": False},
+                    {"text": "Third", "done": False},
+                ]
+                self.assertEqual(items, expected)
+                self.assertEqual(todo.load(), expected)
+
+    def test_clear_completed_with_empty_list_persists_empty_list(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(todo, "DATA_FILE", Path(directory) / "todos.json"):
+                items = []
+
+                todo.clear_completed(items)
+
+                self.assertEqual(items, [])
+                self.assertEqual(todo.load(), [])
+
 
 if __name__ == "__main__":
     unittest.main()
