@@ -21,6 +21,19 @@ Blank lines are ignored, and whitespace-only values count as empty. Files with
 malformed CSV quoting, rows whose field count differs from the header, or no
 header produce a command-line error.
 
+## Custom Delimiter
+
+By default, the utility expects comma-separated values. To use a different
+delimiter, pass the `--delimiter` option:
+
+```text
+python csv_summary.py data.tsv --delimiter $'\t'
+python csv_summary.py data.psv --delimiter '|'
+python csv_summary.py data.csv --delimiter ';'
+```
+
+The delimiter must be a single character.
+
 Run the tests from this directory:
 
 ```text
