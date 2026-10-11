@@ -37,12 +37,18 @@ def remove(items: list[dict], index: int) -> None:
     save(items)
 
 
+def clear_completed(items: list[dict]) -> None:
+    items[:] = [item for item in items if not item["done"]]
+    save(items)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     add_parser = sub.add_parser("add")
     add_parser.add_argument("text")
     sub.add_parser("list")
+    sub.add_parser("clear")
     done_parser = sub.add_parser("done")
     done_parser.add_argument("number", type=int)
     remove_parser = sub.add_parser("remove")
@@ -55,6 +61,8 @@ def main() -> None:
         complete(items, args.number)
     elif args.command == "remove":
         remove(items, args.number)
+    elif args.command == "clear":
+        clear_completed(items)
     else:
         for number, item in enumerate(items, 1):
             print(f"[{'x' if item['done'] else ' '}] {number}. {item['text']}")
