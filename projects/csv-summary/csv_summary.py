@@ -9,11 +9,27 @@ class CsvSummaryError(Exception):
     """Raised when a CSV file cannot be summarized."""
 
 
-def summarize_csv(path: Path) -> tuple[int, list[str], list[int]]:
-    """Return the data-row count, column names, and non-empty count per column."""
+def _validate_delimiter(delimiter: str) -> None:
+    """Validate that the delimiter is a single character."""
+    if not delimiter or len(delimiter) != 1:
+        raise CsvSummaryError(
+            f"Delimiter must be a single character, got: {repr(delimiter)}"
+        )
+
+
+def summarize_csv(
+    path: Path, delimiter: str = ","
+) -> tuple[int, list[str], list[int]]:
+    """Return the data-row count, column names, and non-empty count per column.
+    
+    Args:
+        path: Path to the CSV file.
+        delimiter: Field delimiter character (default: comma).
+    """
+    _validate_delimiter(delimiter)
     try:
         with path.open(encoding="utf-8", newline="") as csv_file:
-            reader = csv.reader(csv_file, strict=True)
+            reader = csv.reader(csv_file, delimiter=delimiter, strict=True)
             try:
                 columns = next(reader)
             except StopIteration as error:
@@ -44,10 +60,15 @@ def summarize_csv(path: Path) -> tuple[int, list[str], list[int]]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("file", type=Path, help="CSV file to summarize")
+    parser.add_argument(
+        "--delimiter",
+        default=",",
+        help="Field delimiter character (default: comma)",
+    )
     args = parser.parse_args()
 
     try:
-        row_count, columns, counts = summarize_csv(args.file)
+        row_count, columns, counts = summarize_csv(args.file, delimiter=args.delimiter)
     except CsvSummaryError as error:
         parser.error(f"cannot summarize {args.file}: {error}")
 

@@ -76,6 +76,55 @@ class CsvSummaryTests(unittest.TestCase):
                 "  city: 1\n",
             )
 
+    def test_custom_delimiter_pipe(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = self.write_csv(directory, "name|city|note\nAda|London|\n")
+
+            self.assertEqual(
+                summarize_csv(path, delimiter="|"),
+                (1, ["name", "city", "note"], [1, 1, 0]),
+            )
+
+    def test_custom_delimiter_semicolon(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = self.write_csv(directory, "name;city;note\nAda;Paris;\n")
+
+            self.assertEqual(
+                summarize_csv(path, delimiter=";"),
+                (1, ["name", "city", "note"], [1, 1, 0]),
+            )
+
+    def test_custom_delimiter_via_cli(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = self.write_csv(directory, "name|city\nAda|London\n")
+            output = io.StringIO()
+            with patch("sys.argv", ["csv_summary.py", str(path), "--delimiter", "|"]):
+                with contextlib.redirect_stdout(output):
+                    main()
+
+            self.assertEqual(
+                output.getvalue(),
+                "Data rows: 1\n"
+                "Columns: name, city\n"
+                "Non-empty values:\n"
+                "  name: 1\n"
+                "  city: 1\n",
+            )
+
+    def test_rejects_invalid_delimiter_empty(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = self.write_csv(directory, "name,city\nAda,London\n")
+
+            with self.assertRaisesRegex(CsvSummaryError, "single character"):
+                summarize_csv(path, delimiter="")
+
+    def test_rejects_invalid_delimiter_multi_char(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = self.write_csv(directory, "name,city\nAda,London\n")
+
+            with self.assertRaisesRegex(CsvSummaryError, "single character"):
+                summarize_csv(path, delimiter="::")
+
 
 if __name__ == "__main__":
     unittest.main()
